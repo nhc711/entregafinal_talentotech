@@ -1,0 +1,114 @@
+import json
+import dataset
+
+baseDatos = dataset.connect("sqlite:///datos.db")
+stock = baseDatos["Productos"]
+controlMenu = "z"
+bucleAgregar = 0
+
+while True:
+    controlMenu = input(f"Ingrese A para agregar un producto nuevo \nIngrese V para ver el stock \nIngrese B para buscar un producto \nIngrese E para eliminar un producto \nIngrese S para salir del menu \n\nIngrese acción deseada: ").title().strip()
+    match controlMenu:
+
+        case "S":
+            print(f"\n¡adiós! :D")
+            break
+
+        case "A":
+            while True:
+                productoNombre = input(f"\nIngrese el nombre del producto que quiera agregar: ").title().strip()
+                productoCategoria = input(f"Ingrese la categoría del producto: ").title().strip()
+                productoPrecio = float(input(f"Ingrese el precio del producto (en números sin punto ni coma): "))
+
+                print(f'\nIngresaste: {productoNombre} | {productoCategoria} | {productoPrecio}')
+                correccion = input(f"¿Los valores son correctos? (S/N)").title()
+
+                while True:
+                    match correccion:
+                        case "S":
+                            stock.insert({
+                                "Nombre":productoNombre, 
+                                "Categoria":productoCategoria, 
+                                "Precio":productoPrecio})
+                            print(f"\nProducto agregado correctamente.\n")
+                            break
+                        case "N":
+                            break
+                        case _:
+                            correccion = input(f"\nIngrese S para continuar, N para corregir.\n").title()
+                if correccion == "N":
+                    continue
+                else: 
+                    continuar = input(f"¿Deseas cargar otro producto? (S/N)").title()
+                    if continuar == "S":
+                        continue
+                    else:
+                        break
+
+        case "V":
+            print()
+
+            for item in stock:
+                print(f'ID: {item["id"]} | Producto: {item["Nombre"]} | Precio: {item["Precio"]} | Categoria: {item["Categoria"]}')
+            input(f"\nenter para continuar\n")
+
+        case "B":
+            productoABuscar = input("\nIngrese el nombre del producto a buscar: ").title().strip()
+
+            productosEncontrados = [
+                item for item in stock
+                if productoABuscar in item["Nombre"]]
+
+            if productosEncontrados:
+                print(f"\nResultados para '{productoABuscar}':")
+                for item in productosEncontrados:
+                    print(f"ID: {item['id']} | Producto: {item['Nombre']} | Precio: {item['Precio']} | Categoria: {item['Categoria']}")
+            else:
+                print(f"\nNo se encontraron productos que coincidan con '{productoABuscar}'.")
+
+        case "E":
+            while True:
+                eliminar = int(input(f"\nIntroduzca el ID de producto a eliminar: ").strip())
+                producto = stock.find_one(id=eliminar)
+                if producto is None:
+                    print(f"No se encontró ningún producto con el ID {eliminar}.")
+                    imprimirStock = input(f"\n¿Quiere ver el stock? (S/N)").title().strip()
+                    if imprimirStock == "S":
+                        for item in stock:
+                            print(f'ID: {item["id"]} | Producto: {item["Nombre"]} | Precio: {item["Precio"]} | Categoria: {item["Categoria"]}')
+                        print()
+                    continue
+                    
+                print(f"\nVas a eliminar: ID = {producto['id']} | Producto ={ producto['Nombre']} | Precio = {producto['Precio']}")
+                confirmar = input("¿Estás seguro de que querés eliminarlo? Esta acción no se puede deshacer (S/N): ").title().strip()
+                while confirmar not in ("S","N"):
+                    confirmar = input(f"Ingresá S para eliminar el Producto, N para cancelar.").title().strip()
+                if confirmar == "S":
+                    stock.delete(id=eliminar)
+                    print("\nProducto eliminado correctamente.\n")
+                    break
+                else:
+                    print("\nEliminación cancelada.\n")
+                    break
+
+        case _:
+            print(f"\n")
+
+
+# import json
+# with open("nombre.json","w") as archivo
+#   json.dump()
+# ----
+# lista = []
+# with open("nombre.json","r") as archivo:
+#   lista = json.load(archivo)
+# print(lista)
+#
+# with open("datos.txt", "r") as archivo:
+#   for linea in archivo:
+#       productos.append(linea.strip())
+#  
+# def actualizar:
+#   with open("datos.txt", "w") as archivo:
+#       for producto in productos: 
+#           archivo.write(producto + "\n")
